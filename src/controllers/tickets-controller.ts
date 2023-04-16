@@ -23,3 +23,18 @@ export async function getTickets(req: AuthenticatedRequest, res: Response) {
     return res.status(httpStatus.NOT_FOUND);
   }
 }
+
+export async function postCreateTicket(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+  const { ticketTypeId } = req.body;
+    if (!ticketTypeId) {
+      return res.status(httpStatus.BAD_REQUEST).send('Missing ticket type id');
+    }
+  try {
+    const ticket = await ticketService.createTicket(userId, ticketTypeId);
+    return res.status(httpStatus.OK).send(ticket);
+  }
+  catch (error) {
+    return res.status(httpStatus.NOT_FOUND);
+  }
+}

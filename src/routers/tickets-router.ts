@@ -3,9 +3,10 @@ import { authenticateToken } from '@/middlewares';
 import { getTicketTypes, getTickets, postCreateTicket } from '@/controllers/tickets-controller';
 
 const ticketsRouter = Router();
+
 ticketsRouter.all('/*', authenticateToken)
-.get('/types')
-.get('')
-.post('');
+.get('/types', getTicketTypes)
+.get('', getTickets)
+.post('', postCreateTicket);
 
 export { ticketsRouter };
