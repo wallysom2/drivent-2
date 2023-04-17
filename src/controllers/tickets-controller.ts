@@ -1,41 +1,45 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import httpStatus from 'http-status';
-import ticketService from '@/services/tickets-service';
 import { AuthenticatedRequest } from '@/middlewares';
+import ticketService from '@/services/tickets-service';
 
 export async function getTicketTypes(req: AuthenticatedRequest, res: Response) {
   try {
     const ticketTypes = await ticketService.getTicketTypes();
+
     return res.status(httpStatus.OK).send(ticketTypes);
-    }
-  catch (error) {
-    return res.status(httpStatus.NOT_FOUND);
+  } catch (error) {
+    return res.sendStatus(httpStatus.NO_CONTENT);
   }
 }
 
 export async function getTickets(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
+
   try {
-    const tickets = await ticketService.getTicketsById(userId);
-    return res.status(httpStatus.OK).send(tickets);
-  }
-  catch (error) {
-    return res.status(httpStatus.NOT_FOUND);
+    const ticketTypes = await ticketService.getTicketByUserId(userId);
+
+    return res.status(httpStatus.OK).send(ticketTypes);
+  } catch (error) {
+    return res.sendStatus(httpStatus.NOT_FOUND);
   }
 }
 
-export async function postCreateTicket(req: AuthenticatedRequest, res: Response) {
+export async function createTicket(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
+
+  //TODO validação do JOI
   const { ticketTypeId } = req.body;
 
-    if (!ticketTypeId) {
-      return res.status(httpStatus.BAD_REQUEST).send('Missing ticket type id');
-    }
-  try {
-    const ticket = await ticketService.createTicket(userId, ticketTypeId);
-    return res.status(httpStatus.OK).send(ticket);
+  if (!ticketTypeId) {
+    return res.sendStatus(httpStatus.BAD_REQUEST);
   }
-  catch (error) {
-    return res.status(httpStatus.NOT_FOUND);
+
+  try {
+    const ticketTypes = await ticketService.createTicket(userId, ticketTypeId);
+
+    return res.status(httpStatus.CREATED).send(ticketTypes);
+  } catch (error) {
+    return res.sendStatus(httpStatus.NOT_FOUND);
   }
 }
